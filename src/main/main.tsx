@@ -1,11 +1,12 @@
-import { ApolloProvider } from '@apollo/client';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import PublishmentList from '../presentation/views/publishment';
 
-ReactDOM.render(
+const container = document.getElementById('root')!
+const root = createRoot(container)
+
+root.render(
 	<React.StrictMode>
 		<PublishmentList />
 	</React.StrictMode>,
-	document.getElementById('root')
 );
