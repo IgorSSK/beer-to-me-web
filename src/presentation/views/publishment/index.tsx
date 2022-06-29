@@ -4,6 +4,7 @@ import { Publishment } from '@domain/models/publishment';
 import { ApolloGraphQLClient } from '@infra/graphql/ApolloGraphQLClient';
 import { LoadPublishmentUseCase } from '@data/use-cases/load-publishments'
 import useSWR from 'swr';
+import Card from './components/Card';
 
 const PublishmentList: React.FC = () => {
 	// const [publishments, setPublishments] = useState<Publishment[]>([])
@@ -20,7 +21,7 @@ const PublishmentList: React.FC = () => {
 
 	if (isValidating) return <div>LoAdInG...</div>
 	if (error) return <span>OPS! { JSON.stringify(error) }</span>
-	if (data) return <ul>{data.map(pub => <li>{pub.id}</li>)}</ul>;
+	if (data) return <>{data.map(pub => <Card id={pub.id} title={pub.product.brand} image={pub.product.imageUrl}></Card>)}</>
 	return null
 }
 
