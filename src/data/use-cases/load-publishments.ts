@@ -1,9 +1,36 @@
 import { gql } from "@apollo/client";
 import { IGraphQLClient } from "@data/protocols/graphql/graphql-client";
-import { Publishment } from "@domain/models/publishment";
-import { ILoadPublishments, LoadPublishment } from "@domain/use-cases/load-publishments";
+import { ILoadPublishmentsUseCase, LoadPublishment } from "@domain/use-cases/load-publishments";
 
-export class LoadPublishmentUseCase implements ILoadPublishments {
+type Response = {
+	findAllPublishments?: {
+		id: string,
+		price: number,
+		condition?: string,
+		confiability: {
+			avarage: number,
+			count: number
+		},
+		estabelishment: {
+			name: string,
+			address: string,
+			imageUrl?: string
+		},
+		product: {
+			brand: string,
+			imageUrl?: string
+		}
+		comments?: {
+			dateTime: Date,
+			text: string,
+			author: string
+		}[],
+		createdAt: Date,
+		updatedAt?: Date
+	}[]
+}
+
+export class LoadPublishmentUseCase implements ILoadPublishmentsUseCase {
 	constructor(private readonly client: IGraphQLClient) { }
 
 	private readonly query = gql`
@@ -36,9 +63,9 @@ export class LoadPublishmentUseCase implements ILoadPublishments {
 	}
 	`
 
-	async request(): Promise<Publishment[]> {
+	async request(): Promise<LoadPublishment.Response> {
 		try {
-			const response = await this.client.request<LoadPublishment.Model>({ query: this.query, requestType: 'query' })
+			const response = await this.client.request<Response>({ query: this.query, requestType: 'query' })
 
 			return response.data?.findAllPublishments ?? []
 		} catch (error) {

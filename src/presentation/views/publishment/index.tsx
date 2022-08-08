@@ -1,28 +1,88 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 
-import { Publishment } from '@domain/models/publishment';
-import { ApolloGraphQLClient } from '@infra/graphql/ApolloGraphQLClient';
-import { LoadPublishmentUseCase } from '@data/use-cases/load-publishments'
+import { LoadPublishmentUseCase } from '@data/use-cases/load-publishments';
 import useSWR from 'swr';
-import Card from './components/Card';
+import { Box, SkeletonCircle, SkeletonText } from '@chakra-ui/react';
+import PublishmentCard from '@presentation/views/publishment/components/PublishmentCard';
+import { VoteConfiabilityUseCase } from '@data/use-cases/vote-confiability';
 
-const PublishmentList: React.FC = () => {
-	// const [publishments, setPublishments] = useState<Publishment[]>([])
+type Props = {
+	injection: [LoadPublishmentUseCase, VoteConfiabilityUseCase];
+};
 
-	// useEffect(() => {
-	// 	const fetch = async () => {
-	// 		const response = await new LoadPublishmentUseCase(new ApolloGraphQLClient('https://j2f8uzh1wg.execute-api.us-east-1.amazonaws.com/dev/graphql', false)).request()
-	// 		setPublishments(response)
-	// 	}
+const PublishmentList: React.FC<Props> = ({
+	injection: [loadPublishmentUseCase, voteConfiabilityUseCase]
+}) => {
+	const { isValidating, data, error, mutate } = useSWR(
+		'LOAD_PUBLISHMENT',
+		async () => await loadPublishmentUseCase.request(),
+		{ revalidateOnFocus: true }
+	);
 
-	// 	fetch()
-	// }, [])
-	const {isValidating, data, error} = useSWR('LOAD_PUBLISHMENT', async () => await new LoadPublishmentUseCase(new ApolloGraphQLClient('https://j2f8uzh1wg.execute-api.us-east-1.amazonaws.com/dev/graphql', false)).request())
+	console.log(data);
 
-	if (isValidating) return <div>LoAdInG...</div>
-	if (error) return <span>OPS! { JSON.stringify(error) }</span>
-	if (data) return <>{data.map(pub => <Card id={pub.id} title={pub.product.brand} image={pub.product.imageUrl}></Card>)}</>
-	return null
-}
+	const handleVotingConfiability = async (publishmentId: string, confiability: number) => {
+		const response = await voteConfiabilityUseCase.request({ publishmentId, confiability });
+
+		if (response) {
+			mutate(
+				publishments => {
+					const modifiedPublishment = publishments?.find(
+						publishment => publishment.id === publishmentId
+					);
+					const filteredPublishments = publishments?.filter(
+						publishment => publishment.id !== publishmentId
+					);
+
+					console.log([
+						...filteredPublishments,
+						{ ...modifiedPublishment, confiability: response }
+					]);
+
+					return [
+						...filteredPublishments,
+						{ ...modifiedPublishment, confiability: response }
+					];
+				},
+				{ revalidate: true, populateCache: true }
+			);
+		}
+	};
+
+	if (isValidating)
+		return (
+			<>
+				{[1, 2, 3, 4].map(i => (
+					<Box
+						key={i}
+						marginY="4"
+						padding="6"
+						boxShadow="lg"
+						bg="white"
+						w="full"
+						minWidth="280px"
+						maxWidth="800px"
+					>
+						<SkeletonCircle size="10" />
+						<SkeletonText mt="4" noOfLines={4} spacing="4" />
+					</Box>
+				))}
+			</>
+		);
+	if (error) return <span>OPS! {JSON.stringify(error)}</span>;
+	if (data)
+		return (
+			<>
+				{data.map(publishment => (
+					<PublishmentCard
+						key={publishment.id}
+						publishment={publishment}
+						onConfiabilityVote={handleVotingConfiability}
+					/>
+				))}
+			</>
+		);
+	return null;
+};
 
 export default PublishmentList;

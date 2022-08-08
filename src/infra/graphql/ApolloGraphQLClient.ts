@@ -20,8 +20,6 @@ export class ApolloGraphQLClient implements IGraphQLClient {
 				? await this.client.query<T>({ query, ...request })
 				: await this.client.mutate<T>({ mutation: query, ...request })
 
-			response.errors
-
 			return {
 				data: response.data,
 				statusCode: response.errors ? GraphQLClient.StatusCode.badRequest : GraphQLClient.StatusCode.ok,

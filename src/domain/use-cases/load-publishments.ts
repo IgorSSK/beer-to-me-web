@@ -1,9 +1,9 @@
 import { Publishment } from "@domain/models/publishment"
 
-export interface ILoadPublishments {
-	request: () => Promise<LoadPublishment.Model>
+export namespace LoadPublishment {
+	export type Response = Publishment[]
 }
 
-export namespace LoadPublishment {
-	export type Model = { findAllPublishments: Publishment[] }
+export interface ILoadPublishmentsUseCase {
+	request: () => Promise<LoadPublishment.Response>
 }

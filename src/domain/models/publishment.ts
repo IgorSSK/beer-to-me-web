@@ -1,11 +1,14 @@
+export type Confiability = {
+	avarage: number,
+	count: number
+}
+
+
 export type Publishment = {
 	id: string,
 	price: number,
 	condition?: string,
-	confiability: {
-		avarage: number,
-		count: number
-	},
+	confiability: Confiability,
 	estabelishment: {
 		name: string,
 		address: string,
