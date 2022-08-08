@@ -33,6 +33,18 @@
 			"@application/*": [
 				"application/*"
 			],
+			"@presentation/*": [
+				"presentation/*"
+			],
+			"@main/*": [
+				"main/*"
+			],
+			"@main/*": [
+				"main/*"
+			],
+			"@common/*": [
+				"common/*"
+			],
 			"@tests/*": [
 				"../tests/*"
 			]

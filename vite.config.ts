@@ -9,6 +9,9 @@ export default defineConfig({
 		alias: [{ find: "@domain", replacement: path.resolve(__dirname, "./src/domain") },
 		{ find: "@data", replacement: path.resolve(__dirname, "./src/data") },
 		{ find: "@infra", replacement: path.resolve(__dirname, "./src/infra") },
-		{ find: "@application", replacement: path.resolve(__dirname, "./src/application") }]
+		{ find: "@application", replacement: path.resolve(__dirname, "./src/application") },
+		{ find: "@presentation", replacement: path.resolve(__dirname, "./src/presentation") },
+		{ find: "@main", replacement: path.resolve(__dirname, "./src/main") },
+		{ find: "@common", replacement: path.resolve(__dirname, "./src/common") }]
 	}
 });
